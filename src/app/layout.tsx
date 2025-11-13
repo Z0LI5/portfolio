@@ -21,6 +21,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <a href="/projects" className="hover:text-accent">
                   Projects
                 </a>
+                <a href="/photos" className="hover:text-accent">
+                  Photos
+                </a>
               </nav>
             </div>
           </header>
