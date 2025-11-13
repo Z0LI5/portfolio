@@ -280,6 +280,35 @@ a.accent-link:hover {
   margin: 1.5rem 0;
   border: 1px solid var(--border);
 }
+/* Responsive images */
+article img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 2rem 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Center images */
+article p img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Image captions (if using alt text) */
+article img[alt] {
+  display: block;
+}
+
+article img[alt]::after {
+  content: attr(alt);
+  display: block;
+  text-align: center;
+  font-style: italic;
+  color: #666;
+  margin-top: 0.5rem;
+}
 
 /* Heading links (from remark-autolink-headings) */
 .heading-link {
