@@ -2,10 +2,11 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { remark } from "remark";
-import html from "remark-html";
 import remarkGfm from "remark-gfm";
-import remarkSlug from "remark-slug";
-import remarkAutolinkHeadings from "remark-autolink-headings";
+import remarkRehype from "remark-rehype";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypeStringify from "rehype-stringify";
 
 // ✅ Now points to src/projects
 const projectsDir = path.join(process.cwd(), "src", "projects");
@@ -51,17 +52,30 @@ export async function getProjectBySlug(slug: string) {
   const { data, content } = matter(fileContent);
 
   const processedContent = await remark()
-    .use(remarkGfm) // ✅ GitHub Flavored Markdown (tables, strikethrough, task lists)
-    .use(remarkSlug) // ✅ Adds id attributes to headings
-    .use(remarkAutolinkHeadings, {
+    .use(remarkGfm) // ✅ GitHub Flavored Markdown
+    .use(remarkRehype, { allowDangerousHtml: true }) // ✅ Convert markdown to HTML
+    .use(rehypeSlug) // ✅ Adds id attributes to headings
+    .use(rehypeAutolinkHeadings, {
       behavior: "wrap", // Wraps heading text in a link
       properties: {
         className: ["heading-link"], // Adds class for styling
       },
     })
-    .use(html, { sanitize: false }) // ✅ Allows raw HTML if needed
+    .use(rehypeStringify, { allowDangerousHtml: true }) // ✅ Convert to HTML string
     .process(content);
+
   const contentHtml = processedContent.toString();
 
-  return { slug, contentHtml, ...data };
+  // ✅ Return all frontmatter data along with contentHtml
+  return {
+    slug,
+    contentHtml,
+    ...data,
+  } as {
+    slug: string;
+    contentHtml: string;
+    title: string;
+    date: string;
+    summary: string;
+  };
 }

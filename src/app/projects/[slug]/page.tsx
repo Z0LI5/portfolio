@@ -1,4 +1,3 @@
-import Layout from "@/components/Layout";
 import { getAllProjects, getProjectBySlug } from "@/lib/markdown";
 
 export async function generateStaticParams() {
