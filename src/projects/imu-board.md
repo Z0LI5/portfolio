@@ -2,6 +2,7 @@
 title: "Multi-IMU Precision Motion Sensor Board"
 date: "2025-11-13"
 summary: "Compact 40mm×40mm sensor fusion board with 8 LSM6DSVTR IMUs, high-speed SPI multiplexing, and CAN bus communication for precision motion tracking."
+tags: "electrical engineering, pcb design, hardware, embedded systems"
 ---
 
 ## Overview

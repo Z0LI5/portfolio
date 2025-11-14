@@ -7,6 +7,8 @@ import remarkRehype from "remark-rehype";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeStringify from "rehype-stringify";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 
 // ✅ Now points to src/projects
 const projectsDir = path.join(process.cwd(), "src", "projects");
@@ -33,10 +35,10 @@ export async function getAllProjects() {
       title: string;
       date: string;
       summary: string;
+      tags?: string; // ✅ Add tags
     };
   });
 
-  // ✅ Sort by date (newest first)
   return projects.sort((a, b) => {
     return new Date(b.date).getTime() - new Date(a.date).getTime();
   });
@@ -52,21 +54,22 @@ export async function getProjectBySlug(slug: string) {
   const { data, content } = matter(fileContent);
 
   const processedContent = await remark()
-    .use(remarkGfm) // ✅ GitHub Flavored Markdown
-    .use(remarkRehype, { allowDangerousHtml: true }) // ✅ Convert markdown to HTML
-    .use(rehypeSlug) // ✅ Adds id attributes to headings
+    .use(remarkGfm)
+    .use(remarkMath)
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeKatex)
+    .use(rehypeSlug)
     .use(rehypeAutolinkHeadings, {
-      behavior: "wrap", // Wraps heading text in a link
+      behavior: "wrap",
       properties: {
-        className: ["heading-link"], // Adds class for styling
+        className: ["heading-link"],
       },
     })
-    .use(rehypeStringify, { allowDangerousHtml: true }) // ✅ Convert to HTML string
+    .use(rehypeStringify, { allowDangerousHtml: true })
     .process(content);
 
   const contentHtml = processedContent.toString();
 
-  // ✅ Return all frontmatter data along with contentHtml
   return {
     slug,
     contentHtml,
@@ -77,5 +80,6 @@ export async function getProjectBySlug(slug: string) {
     title: string;
     date: string;
     summary: string;
+    tags?: string; // ✅ Add tags
   };
 }

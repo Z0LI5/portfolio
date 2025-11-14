@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "katex/dist/katex.min.css";
 
 :root {
   --background: #ffffff;
@@ -32,6 +33,9 @@
     --border: #373737;
     --code-bg: #2f2f2f;
     --hover-bg: #2f2f2f;
+  }
+  .katex {
+    color: var(--foreground);
   }
 } */
 
@@ -174,6 +178,23 @@ a.accent-link:hover {
   line-height: 1.65;
   color: var(--foreground);
 }
+
+.prose a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.prose a:hover {
+  opacity: 0.7;
+}
+/* 
+External link indicator (optional)
+.prose a[href^="http"]::after {
+  content: " ↗";
+  font-size: 0.85em;
+  opacity: 0.6;
+} */
 
 .prose strong {
   font-weight: 600;
@@ -365,4 +386,15 @@ model-viewer {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--foreground-light);
+}
+
+/* Math styling */
+.katex {
+  font-size: 1.1em;
+}
+
+.katex-display {
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
 }

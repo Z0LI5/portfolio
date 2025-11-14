@@ -15,13 +15,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 Nikhil Devisetty
               </a>
               <nav className="flex gap-6 text-sm text-neutral-600">
-                <a href="/" className="hover:text-accent">
-                  Home
-                </a>
                 <a href="/projects" className="hover:text-accent">
                   Projects
                 </a>
-                <a href="/photos" className="hover:text-accent">
+                <a
+                  href="https://nikhildevisetty.mypixieset.com/"
+                  target="_blank"
+                  className="hover:text-accent"
+                >
                   Photos
                 </a>
               </nav>
