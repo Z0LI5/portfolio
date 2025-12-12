@@ -7,50 +7,56 @@ tags: "electrical engineering, pcb design, hardware, embedded systems"
 
 ## Overview
 
-For Advanced Robotics at the University of Washington, I was tasked to create a small CAN-enabled IMU board to measure the motion of the our robot. We wanted to use to up to **4 IMUs** to improve measurement precision.
+As part of Advanced Robotics at the University of Washington, I designed a high-precision IMU board to improve our robot’s motion-tracking accuracy. The goal was to integrate multiple IMUs on a small form factor and fuse their data for more reliable orientation and motion measurements during competition.
 
 ## Simulation
 
-To understand how multiple IMUs would the resulting measurement, I ran a simulation on python with 8 IMUs, each with a different amount of noise based on the Farrenkompf noise model. This will most accurately simulate what real IMUs data may look like.
+Before designing the hardware, I ran Python simulations using an **8-IMU noise model** based on Farrenkompf sensor characteristics. Each IMU was given a different noise profile to reflect real-world variability. Averaging the signals significantly reduced noise and tracked the ideal waveform closely.
 
-![Image1](/projects/IMUBoard_Simulation.png)
+![Image1](/projects/IMUBoard_Simulation.png)  
 ![Image2](/projects/IMUBoard_Simulation_2.png)
-
-The first image shows all the different IMUs and their respective signal (in this case it is a sine wave) and second image shows the average value of all 8 IMUs compared against a regular sine wave.
 
 ## System Architecture
 
-- **Sensor Array**: 8× LSM6DSVTR IMUs positioned maximally distributed across the board
-- **Data Fusion**: Averaging algorithm across all IMUs using high sampling rates (sine wave simulation with noise model)
-- **Communication**: CAN bus interface (PA11/PA12) via MCP2562T-E/MF transceiver
-- **Thermal Management**: Individual shunt resistors (RNCF0805DTE2K50) beneath each sensor, relay-controlled (VO1400AEFTR) for temperature stabilization
+- **Sensor Array:** Four LSM6DSVTR IMUs placed to maximize spatial separation
+- **Data Fusion:** High-speed sampling and averaging across all IMUs
+- **Communication:** CAN interface using a CAN transceiver
+- **Thermal Control:** Resistor-based heating elements below each IMU, switched via relay
 
 ## Hardware Design
 
-**MCU**: STM32F042F4P6 (TSSOP20)
+### Microcontroller
 
-- High-speed SPI multiplexing with 3:8 decoder (MC74HC138ADR2G)
-- Software NSS chip selection (PA1-PA4) for sequential IMU polling
-- Optimized for minimal switching latency across all sensors
+**STM32F042F4P6 (TSSOP20)**
 
-**Power System**:
+- Chosen for its small footprint and high-speed SPI support
+- SPI used instead of I2C to take advantage of **80 MHz bandwidth**, improving sampling rates
+- Enough available GPIO pins allowed direct chip-select control without needing a multiplexer
+- A 3:8 decoder (MC74HC138ADR2G) reduces switching latency and simplifies routing
 
-- Input: 24V → 5V buck converter (AP63201QWU-7, 1A)
-- 5V → 3.3V LDO (MIC5504-3.3YM5-TR, ≤300mA) for MCU
-- 5V → 1.8V LDO (MIC5365-1.8YC5-TR, ~8mA) for IMU array
-- 24V direct feed for heating elements
+### Power System
 
-**Physical Specs**:
+- **24V → 5V Buck Converter (AP63201QWU-7):** High efficiency and a naturally slower transient response, which helps smooth out any unexpected input changes
+- **5V → 3.3V LDO (MIC5504-3.3YM5-TR):** Selected to comfortably supply the MCU and digital logic
+- **5V → 1.8V LDO (MIC5365-1.8YC5-TR):** Supports low-current IMU array
+- **24V Line:** Directly drives the custom heating elements
 
-- Form factor: 40mm × 40mm (Board Type C compliant)
-- Mounting: M3 holes at 23mm × 33mm spacing
-- Operating range: -40°C to 85°C
+### Heating Control
+
+- Controlled through a relay (VO1400AEFTR) for simplicity and reliability
+- Future revision will move to a MOSFET + gate driver for reduced cost and faster switching
+
+### Physical Specs
+
+- 25mm × 35mm form factor
+- M3 mounting holes (23mm × 33mm spacing)
+- Operating range: −40°C to 85°C
 
 ## Technical Challenges
 
-- **SPI Bottleneck**: Sequential chip selection means only one IMU active at a time—compensated with high polling frequency
-- **Thermal Distribution**: Localized heating via shunt resistors prevents gradient issues
-- **RTS Noise**: Deferred for future iteration—current averaging approach sufficient for initial implementation
+- **SPI Timing:** Only one IMU can be active at a time, so the firmware is optimized for very fast sequential polling
+- **Thermal Variation:** Localized heating maintains consistent sensor temperature and reduces measurement drift
+- **Noise Reduction:** Multi-IMU averaging provides significantly cleaner signals compared to a single-IMU setup
 
 ## Final Board Design
 
